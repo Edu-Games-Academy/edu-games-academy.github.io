@@ -1,0 +1,205 @@
+name: Update Product Showcase
+
+on:
+  schedule:
+    # Run daily at 00:00 UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  update-products:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install selenium pillow requests
+          
+      - name: Install Chrome and ChromeDriver
+        run: |
+          # Install Chrome
+          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+          
+          # Install ChromeDriver using compatible version
+          sudo apt-get install -y unzip wget
+          wget -q "https://chromedriver.storage.googleapis.com/LATEST_RELEASE" -O /tmp/version
+          CHROMEDRIVER_VERSION=$(cat /tmp/version)
+          wget -q "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" -O /tmp/chromedriver.zip
+          unzip /tmp/chromedriver.zip -d /tmp/
+          sudo mv /tmp/chromedriver /usr/local/bin/
+          sudo chmod +x /usr/local/bin/chromedriver
+      
+      - name: Create update script
+        run: |
+          cat > update_products.py << 'EOFPYTHON'
+          import json
+          import os
+          import time
+          import requests
+          from selenium import webdriver
+          from selenium.webdriver.chrome.service import Service
+          from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.common.by import By
+          from selenium.webdriver.support.ui import WebDriverWait
+          from selenium.webdriver.support import expected_conditions as EC
+          
+          def get_org_repos_with_pages(org_name, token=None):
+              """Fetch all repos from the organization that have a github-pages branch."""
+              headers = {}
+              if token:
+                  headers['Authorization'] = f'token {token}'
+              
+              repos_with_pages = []
+              page = 1
+              
+              while True:
+                  url = f'https://api.github.com/orgs/{org_name}/repos?per_page=100&page={page}'
+                  response = requests.get(url, headers=headers)
+                  
+                  if response.status_code != 200:
+                      print(f"Error fetching repos: {response.status_code}")
+                      break
+                  
+                  repos = response.json()
+                  if not repos:
+                      break
+                  
+                  for repo in repos:
+                      repo_name = repo['name']
+                      # Check if repo has a github-pages branch
+                      branches_url = f"https://api.github.com/repos/{org_name}/{repo_name}/branches"
+                      branches_response = requests.get(branches_url, headers=headers)
+                      
+                      if branches_response.status_code == 200:
+                          branches = branches_response.json()
+                          branch_names = [b['name'] for b in branches]
+                          
+                          if 'gh-pages' in branch_names or 'github-pages' in branch_names:
+                              pages_url = f"https://{org_name}.github.io/{repo_name}/"
+                              repos_with_pages.append({
+                                  'name': repo_name,
+                                  'url': pages_url,
+                                  'description': repo.get('description', '')
+                              })
+                              print(f"Found repo with GitHub Pages: {repo_name}")
+                  
+                  page += 1
+              
+              return repos_with_pages
+          
+          def take_screenshot(url, output_path, width=1920, height=1080):
+              """Take a screenshot of a webpage using Selenium."""
+              chrome_options = Options()
+              chrome_options.add_argument('--headless')
+              chrome_options.add_argument('--no-sandbox')
+              chrome_options.add_argument('--disable-dev-shm-usage')
+              chrome_options.add_argument(f'--window-size={width},{height}')
+              chrome_options.add_argument('--disable-gpu')
+              
+              try:
+                  driver = webdriver.Chrome(options=chrome_options)
+                  driver.set_window_size(width, height)
+                  
+                  print(f"Loading {url}...")
+                  driver.get(url)
+                  
+                  # Wait for page to load
+                  time.sleep(3)
+                  
+                  # Try to wait for body element
+                  try:
+                      WebDriverWait(driver, 10).until(
+                          EC.presence_of_element_located((By.TAG_NAME, "body"))
+                      )
+                  except:
+                      pass
+                  
+                  # Take screenshot
+                  driver.save_screenshot(output_path)
+                  print(f"Screenshot saved to {output_path}")
+                  
+                  driver.quit()
+                  return True
+              except Exception as e:
+                  print(f"Error taking screenshot: {e}")
+                  return False
+          
+          def main():
+              org_name = "Edu-Games-Academy"
+              token = os.environ.get('GITHUB_TOKEN')
+              
+              # Create screenshots directory
+              os.makedirs('screenshots', exist_ok=True)
+              
+              # Get repos with GitHub Pages
+              print(f"Fetching repos from {org_name}...")
+              repos = get_org_repos_with_pages(org_name, token)
+              
+              if not repos:
+                  print("No repos with GitHub Pages found.")
+                  # Keep empty products.json
+                  with open('products.json', 'w') as f:
+                      json.dump([], f, indent=2)
+                  return
+              
+              print(f"Found {len(repos)} repos with GitHub Pages")
+              
+              # Take screenshots
+              products = []
+              for repo in repos:
+                  repo_name = repo['name']
+                  screenshot_path = f"screenshots/{repo_name}.png"
+                  
+                  # Try to take screenshot
+                  success = take_screenshot(repo['url'], screenshot_path)
+                  
+                  product = {
+                      'name': repo_name.replace('-', ' ').title(),
+                      'url': repo['url'],
+                      'description': repo['description'] or f'An educational game from {org_name}',
+                      'screenshot': f'./{screenshot_path}' if success else None
+                  }
+                  products.append(product)
+              
+              # Save products.json
+              with open('products.json', 'w') as f:
+                  json.dump(products, f, indent=2)
+              
+              print(f"Updated products.json with {len(products)} products")
+          
+          if __name__ == '__main__':
+              main()
+          EOFPYTHON
+      
+      - name: Run update script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python update_products.py
+      
+      - name: Commit and push if changed
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+          git add products.json screenshots/
+          
+          # Check if there are changes to commit
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update product showcase [automated]"
+            git push
+          fi
