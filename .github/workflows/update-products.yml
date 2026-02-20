@@ -116,7 +116,7 @@ jobs:
                       WebDriverWait(driver, 10).until(
                           EC.presence_of_element_located((By.TAG_NAME, "body"))
                       )
-                  except:
+                  except Exception:
                       pass
                   
                   # Take screenshot
@@ -131,7 +131,7 @@ jobs:
                   if driver:
                       try:
                           driver.quit()
-                      except:
+                      except Exception:
                           pass
           
           def main():
