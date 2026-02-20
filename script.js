@@ -67,7 +67,7 @@ function createCard(product, index) {
     
     const imageElement = product.screenshot 
         ? `<img src="${product.screenshot}" alt="${product.name} screenshot">`
-        : `<div class="card-image">🎮</div>`;
+        : `🎮`;
     
     card.innerHTML = `
         <div class="card-image">
@@ -195,18 +195,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const carouselWrapper = document.getElementById('carouselWrapper');
     carouselWrapper.addEventListener('mouseenter', stopAutoplay);
     carouselWrapper.addEventListener('mouseleave', startAutoplay);
-});
-
-// Smooth scroll for navigation links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
+    
+    // Smooth scroll for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
     });
 });
