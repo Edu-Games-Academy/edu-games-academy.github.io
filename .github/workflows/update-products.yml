@@ -26,32 +26,23 @@ jobs:
         run: |
           pip install selenium pillow requests
           
-      - name: Install Chrome and ChromeDriver
+      - name: Install Chrome
         run: |
-          # Install Chrome
+          # Install Chrome stable - Selenium Manager will handle ChromeDriver
           wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
           echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable
-          
-          # Install ChromeDriver using compatible version
-          sudo apt-get install -y unzip wget
-          wget -q "https://chromedriver.storage.googleapis.com/LATEST_RELEASE" -O /tmp/version
-          CHROMEDRIVER_VERSION=$(cat /tmp/version)
-          wget -q "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" -O /tmp/chromedriver.zip
-          unzip /tmp/chromedriver.zip -d /tmp/
-          sudo mv /tmp/chromedriver /usr/local/bin/
-          sudo chmod +x /usr/local/bin/chromedriver
       
       - name: Create update script
         run: |
           cat > update_products.py << 'EOFPYTHON'
           import json
           import os
+          import sys
           import time
           import requests
           from selenium import webdriver
-          from selenium.webdriver.chrome.service import Service
           from selenium.webdriver.chrome.options import Options
           from selenium.webdriver.common.by import By
           from selenium.webdriver.support.ui import WebDriverWait
@@ -110,7 +101,9 @@ jobs:
               chrome_options.add_argument(f'--window-size={width},{height}')
               chrome_options.add_argument('--disable-gpu')
               
+              driver = None
               try:
+                  # Selenium Manager will automatically download and manage ChromeDriver
                   driver = webdriver.Chrome(options=chrome_options)
                   driver.set_window_size(width, height)
                   
@@ -130,13 +123,18 @@ jobs:
                   
                   # Take screenshot
                   driver.save_screenshot(output_path)
-                  print(f"Screenshot saved to {output_path}")
+                  print(f"✓ Screenshot saved to {output_path}")
                   
-                  driver.quit()
                   return True
               except Exception as e:
-                  print(f"Error taking screenshot: {e}")
+                  print(f"✗ Error taking screenshot for {url}: {e}")
                   return False
+              finally:
+                  if driver:
+                      try:
+                          driver.quit()
+                      except:
+                          pass
           
           def main():
               org_name = "Edu-Games-Academy"
@@ -160,12 +158,20 @@ jobs:
               
               # Take screenshots
               products = []
+              successful_screenshots = 0
+              failed_screenshots = 0
+              
               for repo in repos:
                   repo_name = repo['name']
                   screenshot_path = f"screenshots/{repo_name}.png"
                   
                   # Try to take screenshot
                   success = take_screenshot(repo['url'], screenshot_path)
+                  
+                  if success:
+                      successful_screenshots += 1
+                  else:
+                      failed_screenshots += 1
                   
                   product = {
                       'name': repo_name.replace('-', ' ').title(),
@@ -179,7 +185,18 @@ jobs:
               with open('products.json', 'w') as f:
                   json.dump(products, f, indent=2)
               
-              print(f"Updated products.json with {len(products)} products")
+              print(f"\n=== Summary ===")
+              print(f"Total products: {len(products)}")
+              print(f"Successful screenshots: {successful_screenshots}")
+              print(f"Failed screenshots: {failed_screenshots}")
+              
+              # Fail if no screenshots were successful
+              if successful_screenshots == 0 and len(repos) > 0:
+                  print("\n✗ ERROR: Failed to capture any screenshots!")
+                  print("The workflow will now fail to prevent deploying incomplete data.")
+                  sys.exit(1)
+              
+              print(f"\n✓ Updated products.json successfully")
           
           if __name__ == '__main__':
               main()
