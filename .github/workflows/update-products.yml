@@ -22,17 +22,15 @@ jobs:
         with:
           python-version: '3.11'
       
+      - name: Setup Chrome and ChromeDriver
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+          install-chromedriver: true
+      
       - name: Install dependencies
         run: |
           pip install selenium pillow requests
-          
-      - name: Install Chrome
-        run: |
-          # Install Chrome stable - Selenium Manager will handle ChromeDriver
-          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-          echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
-          sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
       
       - name: Create update script
         run: |
@@ -103,7 +101,7 @@ jobs:
               
               driver = None
               try:
-                  # Selenium Manager will automatically download and manage ChromeDriver
+                  # ChromeDriver is installed by browser-actions/setup-chrome
                   driver = webdriver.Chrome(options=chrome_options)
                   driver.set_window_size(width, height)
                   
