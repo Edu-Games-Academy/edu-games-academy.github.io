@@ -101,7 +101,8 @@ jobs:
               
               driver = None
               try:
-                  # ChromeDriver is installed by browser-actions/setup-chrome
+                  # ChromeDriver is installed by browser-actions/setup-chrome and added to PATH
+                  # No need for Service parameter as ChromeDriver is automatically located
                   driver = webdriver.Chrome(options=chrome_options)
                   driver.set_window_size(width, height)
                   
