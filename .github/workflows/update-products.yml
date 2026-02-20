@@ -189,7 +189,7 @@ jobs:
               print(f"Failed screenshots: {failed_screenshots}")
               
               # Fail if no screenshots were successful
-              if successful_screenshots == 0 and len(repos) > 0:
+              if successful_screenshots == 0 and failed_screenshots > 0:
                   print("\n✗ ERROR: Failed to capture any screenshots!")
                   print("The workflow will now fail to prevent deploying incomplete data.")
                   sys.exit(1)
