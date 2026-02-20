@@ -40,6 +40,7 @@ jobs:
           import sys
           import time
           import requests
+          import shutil
           from selenium import webdriver
           from selenium.webdriver.chrome.options import Options
           from selenium.webdriver.common.by import By
@@ -98,6 +99,16 @@ jobs:
               chrome_options.add_argument('--disable-dev-shm-usage')
               chrome_options.add_argument(f'--window-size={width},{height}')
               chrome_options.add_argument('--disable-gpu')
+              
+              # Use the Chrome binary installed by setup-chrome action
+              # This ensures ChromeDriver and Chrome versions match
+              chrome_binary = os.environ.get('CHROME_BIN')
+              if not chrome_binary:
+                  # Try to find chrome in PATH (setup-chrome adds it to PATH)
+                  chrome_binary = shutil.which('chrome')
+              if chrome_binary:
+                  chrome_options.binary_location = chrome_binary
+                  print(f"Using Chrome binary: {chrome_binary}")
               
               driver = None
               try:
