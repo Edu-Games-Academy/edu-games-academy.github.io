@@ -3,24 +3,24 @@
     "name": "The Ladder To The Heaven Game",
     "url": "https://Edu-Games-Academy.github.io/The-ladder-to-the-heaven-Game/",
     "description": "Web games for education purpose",
-    "screenshot": null
+    "screenshot": "./screenshots/The-ladder-to-the-heaven-Game.png"
   },
   {
     "name": "Simple Quiz Composer",
     "url": "https://Edu-Games-Academy.github.io/Simple-Quiz-Composer/",
     "description": "A visual editor that generate/modify quiz in multiple formats",
-    "screenshot": null
+    "screenshot": "./screenshots/Simple-Quiz-Composer.png"
   },
   {
     "name": "Dau Truong Tri Tue",
     "url": "https://Edu-Games-Academy.github.io/dau-truong-tri-tue/",
     "description": "An educational game from Edu-Games-Academy",
-    "screenshot": null
+    "screenshot": "./screenshots/dau-truong-tri-tue.png"
   },
   {
     "name": "Tic Tac Toe Edu",
     "url": "https://Edu-Games-Academy.github.io/tic-tac-toe-edu/",
     "description": "An educational game from Edu-Games-Academy",
-    "screenshot": null
+    "screenshot": "./screenshots/tic-tac-toe-edu.png"
   }
 ]
