@@ -22,10 +22,12 @@ jobs:
         with:
           python-version: '3.11'
       
-      - name: Setup Chrome
+      - name: Setup Chrome and ChromeDriver
+        id: setup-chrome
         uses: browser-actions/setup-chrome@v1
         with:
           chrome-version: stable
+          install-chromedriver: true
       
       - name: Install dependencies
         run: |
@@ -34,6 +36,7 @@ jobs:
       - name: Run update script
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHROME_BIN: ${{ steps.setup-chrome.outputs.chrome-path }}
         run: python scripts/update_products.py
       
       - name: Commit and push if changed
