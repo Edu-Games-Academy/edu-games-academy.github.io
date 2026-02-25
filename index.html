@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edu Games Academy - Educational Game Showcase</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <!-- Header -->
     <header class="header">
@@ -15,9 +17,14 @@
                 <h1>Edu Games Academy</h1>
             </div>
             <nav>
-                <a href="#intro">Home</a>
-                <a href="#products">Products</a>
-                <a href="#contact">Contact</a>
+                <div class="lang-switcher">
+                    <button id="lang-en" class="lang-btn active" onclick="switchLanguage('en')">EN</button>
+                    <span class="lang-divider">|</span>
+                    <button id="lang-vi" class="lang-btn" onclick="switchLanguage('vi')">VI</button>
+                </div>
+                <a href="#intro" data-i18n="nav_home">Home</a>
+                <a href="#products" data-i18n="nav_products">Products</a>
+                <a href="#contact" data-i18n="nav_contact">Contact</a>
             </nav>
         </div>
     </header>
@@ -26,27 +33,27 @@
     <section id="intro" class="intro-section">
         <div class="container">
             <div class="intro-content">
-                <h2 class="section-title">Welcome to Edu Games Academy</h2>
-                <p class="intro-text">
-                    Discover our collection of innovative educational games designed to make learning 
-                    fun and engaging. Each game is carefully crafted to provide an immersive 
+                <h2 class="section-title" data-i18n="intro_title">Welcome to Edu Games Academy</h2>
+                <p class="intro-text" data-i18n="intro_text">
+                    Discover our collection of innovative educational games designed to make learning
+                    fun and engaging. Each game is carefully crafted to provide an immersive
                     educational experience that helps students learn while they play.
                 </p>
                 <div class="intro-features">
                     <div class="feature">
                         <span class="feature-icon">🎮</span>
-                        <h3>Interactive Learning</h3>
-                        <p>Engaging gameplay that keeps students motivated</p>
+                        <h3 data-i18n="feature_interactive_title">Interactive Learning</h3>
+                        <p data-i18n="feature_interactive_desc">Engaging gameplay that keeps students motivated</p>
                     </div>
                     <div class="feature">
                         <span class="feature-icon">📚</span>
-                        <h3>Educational Content</h3>
-                        <p>Curriculum-aligned content across subjects</p>
+                        <h3 data-i18n="feature_edu_title">Educational Content</h3>
+                        <p data-i18n="feature_edu_desc">Curriculum-aligned content across subjects</p>
                     </div>
                     <div class="feature">
                         <span class="feature-icon">🌟</span>
-                        <h3>Fun & Effective</h3>
-                        <p>Proven methods for better retention</p>
+                        <h3 data-i18n="feature_fun_title">Fun & Effective</h3>
+                        <p data-i18n="feature_fun_desc">Proven methods for better retention</p>
                     </div>
                 </div>
             </div>
@@ -56,18 +63,19 @@
     <!-- Products Carousel Section -->
     <section id="products" class="products-section">
         <div class="container">
-            <h2 class="section-title">Our Educational Games</h2>
-            <p class="section-subtitle">Explore our collection of interactive learning experiences</p>
-            
+            <h2 class="section-title" data-i18n="products_title">Our Educational Games</h2>
+            <p class="section-subtitle" data-i18n="products_subtitle">Explore our collection of interactive learning
+                experiences</p>
+
             <div class="carousel-container">
                 <div class="carousel-wrapper" id="carouselWrapper">
                     <!-- Products will be loaded dynamically -->
                     <div class="carousel-loading">
                         <div class="spinner"></div>
-                        <p>Loading games...</p>
+                        <p data-i18n="products_loading">Loading games...</p>
                     </div>
                 </div>
-                
+
                 <div class="carousel-controls">
                     <button class="carousel-btn prev-btn" id="prevBtn" aria-label="Previous">
                         ‹
@@ -76,7 +84,7 @@
                         ›
                     </button>
                 </div>
-                
+
                 <div class="carousel-indicators" id="carouselIndicators"></div>
             </div>
         </div>
@@ -85,38 +93,41 @@
     <!-- Contact Section -->
     <section id="contact" class="contact-section">
         <div class="container">
-            <h2 class="section-title">Get In Touch</h2>
-            <p class="section-subtitle">Have questions or want to contribute? We'd love to hear from you!</p>
-            
+            <h2 class="section-title" data-i18n="contact_title">Get In Touch</h2>
+            <p class="section-subtitle" data-i18n="contact_subtitle">Have questions or want to contribute? We'd love to
+                hear from you!</p>
+
             <div class="contact-content">
                 <div class="contact-info">
                     <div class="contact-item">
                         <span class="contact-icon">📧</span>
                         <div>
-                            <h3>Email</h3>
-                            <p>Contact us via GitHub Issues</p>
+                            <h3 data-i18n="contact_email_title">Email</h3>
+                            <p data-i18n="contact_email_desc">Contact us via GitHub Issues</p>
                         </div>
                     </div>
                     <div class="contact-item">
                         <span class="contact-icon">💻</span>
                         <div>
-                            <h3>GitHub</h3>
-                            <p><a href="https://github.com/Edu-Games-Academy" target="_blank">github.com/Edu-Games-Academy</a></p>
+                            <h3 data-i18n="contact_github_title">GitHub</h3>
+                            <p><a href="https://github.com/Edu-Games-Academy" target="_blank"
+                                    data-i18n="contact_github_desc">github.com/Edu-Games-Academy</a></p>
                         </div>
                     </div>
                     <div class="contact-item">
                         <span class="contact-icon">🤝</span>
                         <div>
-                            <h3>Contribute</h3>
-                            <p>Join us in creating amazing educational games</p>
+                            <h3 data-i18n="contact_contribute_title">Contribute</h3>
+                            <p data-i18n="contact_contribute_desc">Join us in creating amazing educational games</p>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="contact-cta">
-                    <h3>Want to collaborate?</h3>
-                    <p>Check out our repositories and feel free to contribute!</p>
-                    <a href="https://github.com/Edu-Games-Academy" class="cta-button" target="_blank">
+                    <h3 data-i18n="contact_cta_title">Want to collaborate?</h3>
+                    <p data-i18n="contact_cta_desc">Check out our repositories and feel free to contribute!</p>
+                    <a href="https://github.com/Edu-Games-Academy" class="cta-button" target="_blank"
+                        data-i18n="contact_cta_button">
                         Visit Our GitHub
                     </a>
                 </div>
@@ -127,11 +138,12 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2026 Edu Games Academy. All rights reserved.</p>
-            <p>Making learning fun, one game at a time! 🎓🎮</p>
+            <p data-i18n="footer_copy">&copy; 2026 Edu Games Academy. All rights reserved.</p>
+            <p data-i18n="footer_slogan">Making learning fun, one game at a time! 🎓🎮</p>
         </div>
     </footer>
 
     <script src="script.js"></script>
 </body>
+
 </html>

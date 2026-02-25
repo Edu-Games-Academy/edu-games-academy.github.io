@@ -1,18 +1,64 @@
 // Carousel functionality
 let currentIndex = 0;
 let products = [];
+let currentLang = localStorage.getItem('preferredLanguage') || 'vi';
+let translations = {};
+
+// Load translations from JSON files
+async function loadTranslations(lang) {
+    try {
+        const response = await fetch(`locales/${lang}.json`);
+        translations[lang] = await response.json();
+    } catch (error) {
+        console.error(`Error loading translations for ${lang}:`, error);
+    }
+}
+
+async function switchLanguage(lang) {
+    if (!translations[lang]) {
+        await loadTranslations(lang);
+    }
+    currentLang = lang;
+    localStorage.setItem('preferredLanguage', lang);
+    updateStaticTranslations();
+    renderCarousel();
+    updateActiveLangButton();
+}
+
+function updateStaticTranslations() {
+    if (!translations[currentLang]) return;
+
+    document.title = translations[currentLang].page_title;
+    document.documentElement.lang = currentLang;
+
+    const elements = document.querySelectorAll('[data-i18n]');
+    elements.forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[currentLang][key]) {
+            el.innerHTML = translations[currentLang][key];
+        }
+    });
+}
+
+function updateActiveLangButton() {
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    const activeBtn = document.getElementById(`lang-${currentLang}`);
+    if (activeBtn) activeBtn.classList.add('active');
+}
 
 // Load products from JSON
 async function loadProducts() {
     try {
         const response = await fetch('products.json');
         products = await response.json();
-        
+
         if (products.length === 0) {
             displayEmptyState();
             return;
         }
-        
+
         renderCarousel();
         updateIndicators();
     } catch (error) {
@@ -27,8 +73,8 @@ function displayEmptyState() {
     wrapper.innerHTML = `
         <div class="carousel-loading">
             <div style="font-size: 4rem; margin-bottom: 1rem;">🎮</div>
-            <p style="font-size: 1.2rem;">No games available yet!</p>
-            <p style="margin-top: 0.5rem;">Check back soon for exciting educational games.</p>
+            <p style="font-size: 1.2rem;">${translations[currentLang].no_games}</p>
+            <p style="margin-top: 0.5rem;">${translations[currentLang].check_back}</p>
         </div>
     `;
     document.querySelector('.carousel-controls').style.display = 'none';
@@ -40,8 +86,8 @@ function displayErrorState() {
     wrapper.innerHTML = `
         <div class="carousel-loading">
             <div style="font-size: 4rem; margin-bottom: 1rem;">⚠️</div>
-            <p style="font-size: 1.2rem;">Unable to load games</p>
-            <p style="margin-top: 0.5rem;">Please try again later.</p>
+            <p style="font-size: 1.2rem;">${translations[currentLang].unable_load}</p>
+            <p style="margin-top: 0.5rem;">${translations[currentLang].try_later}</p>
         </div>
     `;
 }
@@ -50,12 +96,12 @@ function displayErrorState() {
 function renderCarousel() {
     const wrapper = document.getElementById('carouselWrapper');
     wrapper.innerHTML = '';
-    
+
     products.forEach((product, index) => {
         const card = createCard(product, index);
         wrapper.appendChild(card);
     });
-    
+
     updateCardPositions();
 }
 
@@ -64,11 +110,11 @@ function createCard(product, index) {
     const card = document.createElement('div');
     card.className = 'carousel-card';
     card.dataset.index = index;
-    
-    const imageElement = product.screenshot 
+
+    const imageElement = product.screenshot
         ? `<img src="${product.screenshot}" alt="${product.name} screenshot">`
         : `🎮`;
-    
+
     card.innerHTML = `
         <div class="card-image">
             ${imageElement}
@@ -77,27 +123,27 @@ function createCard(product, index) {
             <h3 class="card-title">${product.name}</h3>
             <p class="card-description">${product.description || 'An educational game from Edu Games Academy'}</p>
             <a href="${product.url}" target="_blank" rel="noopener noreferrer" class="card-link">
-                Play Now →
+                ${translations[currentLang].play_now}
             </a>
         </div>
     `;
-    
+
     card.addEventListener('click', () => {
         if (index !== currentIndex) {
             goToSlide(index);
         }
     });
-    
+
     return card;
 }
 
 // Update card positions based on current index
 function updateCardPositions() {
     const cards = document.querySelectorAll('.carousel-card');
-    
+
     cards.forEach((card, index) => {
         card.classList.remove('active', 'next', 'prev', 'hidden');
-        
+
         if (index === currentIndex) {
             card.classList.add('active');
         } else if (index === (currentIndex + 1) % products.length) {
@@ -135,7 +181,7 @@ function goToSlide(index) {
 function updateIndicators() {
     const indicatorsContainer = document.getElementById('carouselIndicators');
     indicatorsContainer.innerHTML = '';
-    
+
     products.forEach((_, index) => {
         const indicator = document.createElement('div');
         indicator.className = `indicator ${index === currentIndex ? 'active' : ''}`;
@@ -156,25 +202,28 @@ function stopAutoplay() {
 }
 
 // Initialize
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadTranslations(currentLang);
+    updateStaticTranslations();
+    updateActiveLangButton();
     loadProducts();
-    
+
     // Setup controls
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
-    
+
     prevBtn.addEventListener('click', () => {
         prevSlide();
         stopAutoplay();
         startAutoplay();
     });
-    
+
     nextBtn.addEventListener('click', () => {
         nextSlide();
         stopAutoplay();
         startAutoplay();
     });
-    
+
     // Keyboard navigation
     document.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowLeft') {
@@ -187,15 +236,15 @@ document.addEventListener('DOMContentLoaded', () => {
             startAutoplay();
         }
     });
-    
+
     // Start autoplay
     startAutoplay();
-    
+
     // Pause autoplay on hover
     const carouselWrapper = document.getElementById('carouselWrapper');
     carouselWrapper.addEventListener('mouseenter', stopAutoplay);
     carouselWrapper.addEventListener('mouseleave', startAutoplay);
-    
+
     // Smooth scroll for navigation links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
