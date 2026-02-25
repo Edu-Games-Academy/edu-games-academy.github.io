@@ -2,7 +2,7 @@
   {
     "name": "The Ladder To The Heaven Game",
     "url": "https://Edu-Games-Academy.github.io/The-ladder-to-the-heaven-Game/",
-    "description": "Web games for education purpose",
+    "description": "Cu\u1ed9c \u0111ua ki\u1ebfn th\u1ee9c \u0111\u1ec3 gi\u00e0nh d\u1eadt \u0111i\u1ec3m s\u1ed1 v\u1edbi nhi\u1ec1u ch\u1eb7ng \u0111ua gi\u1eefa 4 \u0111\u1ed9i ch\u01a1i - The multi-stages knowlege racing between 4 teams",
     "screenshot": "./screenshots/The-ladder-to-the-heaven-Game.png"
   },
   {
@@ -14,13 +14,13 @@
   {
     "name": "Dau Truong Tri Tue",
     "url": "https://Edu-Games-Academy.github.io/dau-truong-tri-tue/",
-    "description": "An educational game from Edu-Games-Academy",
+    "description": "Cu\u1ed9c \u0111ua tr\u00ed tu\u1ec7 v\u1edbi 4 \u0111\u1ed9i ch\u01a1i - A knowlege competition between 4 teams",
     "screenshot": "./screenshots/dau-truong-tri-tue.png"
   },
   {
     "name": "Tic Tac Toe Edu",
     "url": "https://Edu-Games-Academy.github.io/tic-tac-toe-edu/",
-    "description": "An educational game from Edu-Games-Academy",
+    "description": "Tr\u00f2 ch\u01a1i Tic-Tac-Toe gi\u00e1o d\u1ee5c t\u01b0\u01a1ng t\u00e1c d\u00e0nh cho gi\u00e1o vi\u00ean tr\u00ecnh chi\u1ebfu tr\u00ean l\u1edbp h\u1ecdc - Solve the quiz to win the tic-tac-toe game",
     "screenshot": "./screenshots/tic-tac-toe-edu.png"
   }
 ]
